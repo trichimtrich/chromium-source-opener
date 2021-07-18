@@ -2,7 +2,7 @@
 	"name": "chromium-source-opener",
 	"displayName": "Chromium Source Opener",
 	"description": "Link your local chromium code path to remote source.chromium.org",
-	"publisher": "song-fangzhen",
+	"publisher": "FangzhenSong",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/song-fangzhen/chromium-source-opener"

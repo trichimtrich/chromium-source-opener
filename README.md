@@ -1,54 +1,30 @@
-# CSO(Chromium Source Opener) README
+# CSO(Chromium Source Opener)
 
-This is the README for CSO(Chromium Source Opener).
+[![.github/workflows/CI.yml](https://img.shields.io/github/workflow/status/EFanZh/Graphviz-Preview/CI/master)](https://github.com/EFanZh/Graphviz-Preview/actions?query=workflow%3A.github%2Fworkflows%2FCI.yml)
+[![Bors enabled](https://img.shields.io/badge/bors-enabled-brightgreen)](https://app.bors.tech/repositories/23758)
 
-## Features
+Link your local chromium code path to remote [source.chromium.org](source.chromium.org).
 
-Link your local chromium code path to remote source.chromium.org
+## Installation
 
-## Requirements
+You can install this extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=FangzhenSong.chromium-source-opener).
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+## Usage
 
-## Extension Settings
+Right click on the line you want to visit on remote [source.chromium.org](source.chromium.org).
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+For example in //base/values.h:104
 
-For example:
+<img src="images/CSO01.png" onerror="this.onerror=null; this.remove();" alt="CSO01.png" width="600"/>
 
-This extension contributes the following settings:
+Then the same line will be opened in the browser on remote [source.chromium.org](source.chromium.org).
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+<img src="images/CSO02.png" onerror="this.onerror=null; this.remove();" alt="CSO02.png" width="600"/>
 
-## Known Issues
+And one tip message will show on the right-bottom of your VsCode Browser if open operation is executed succesfully.
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+<img src="images/CSO03.png" onerror="this.onerror=null; this.remove();" alt="CSO03.png" width="400"/>
 
-## Release Notes
-
-### 1.0.0
-
-Initial release of CSO(Chromium Source Opener)
-
------------------------------------------------------------------------------------------------------------
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+(No need to worry about, it will disappear in serveral seconds or you can close it manully. :))
 
 **Enjoy!**

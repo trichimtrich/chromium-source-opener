@@ -19,15 +19,15 @@ export function activate(context: vscode.ExtensionContext) {
 		const editor = vscode.window.activeTextEditor;
 
 		if (!editor)	{
-			console.log('no in a valid editor');
-			return ;
+			vscode.window.showInformationMessage('Not in a valid editor!');
+			return;
 		}
 		const baseUrl = "https://source.chromium.org/chromium/chromium/src/+/main:";
 		var path = editor.document.uri.fsPath
 		var src_idx = path.search('src/')
 		if (src_idx == -1) {
-			console.log('not in a src file')
-			return 
+			vscode.window.showInformationMessage('Not in a src file!');
+			return;
 		}
 		path = path.substring(src_idx + 4 )
 		var line = (editor.selection.active.line + 1).toString()

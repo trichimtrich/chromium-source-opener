@@ -8,7 +8,7 @@
 		"type": "git",
 		"url": "https://github.com/song-fangzhen/chromium-source-opener"
 	},
-	"version": "1.0.10",
+	"version": "1.0.11",
 	"engines": {
 		"vscode": "^1.55.0"
 	},
@@ -16,7 +16,8 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:chromium-source-opener.openInWeb"
+		"onCommand:chromium-source-opener.openInWeb",
+		"onCommand:chromium-source-opener.listenWeb"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -24,6 +25,10 @@
 			{
 				"command": "chromium-source-opener.openInWeb",
 				"title": "Open in Chromium-source Website"
+			},
+			{
+				"command": "chromium-source-opener.listenWeb",
+				"title": "Accept request to let browser code opened in VSCode"
 			}
 		],
 		"menus": {

@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as open from 'open';
+import * as child_process from 'child_process';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -38,7 +39,28 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage('Code succesfully showed in WebSite!');
 	});
 
-	context.subscriptions.push(disposable);
+	let listen_started = false;
+	let listen_web = vscode.commands.registerCommand('chromium-source-opener.listenWeb', function() {
+		if (!listen_started) {
+			var execute_command = `python ~/chromium/src/tools/chrome_extensions/open_my_editor/omed.py`;
+			child_process.exec(execute_command, (err, stdout, stderr) => {
+					console.log('stdout: ' + stdout);
+					console.log('stderr: ' + stderr);
+					if (err) {
+							console.log('error: ' + err);
+					}
+			});
+			vscode.window.showInformationMessage('Listening to source.chromium.org successfuly!');
+			listen_started = true;
+		} else {
+			vscode.window.showWarningMessage('Server already started!');
+		}
+	})
+
+	context.subscriptions.push(
+		disposable,
+		listen_web
+	);
 }
 
 // this method is called when your extension is deactivated

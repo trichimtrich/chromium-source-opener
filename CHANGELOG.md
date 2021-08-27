@@ -1,9 +1,20 @@
 # Change Log
 
-All notable changes to the "helloworld" extension will be documented in this file.
+All notable changes to the "`CSO`" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [Release]
 
-- Initial release
+- **Initial release**
+    - What it does now?
+
+        *It connects local `VSCode` dir to remote  [source.chromium.org](https://source.chromium.org).*
+    - What's the next step?
+
+        *Will integrate [`omed.py`](https://source.chromium.org/chromium/chromium/src/+/main:tools/chrome_extensions/open_my_editor/omed.py) into this extension so that we can choose from  [source.chromium.org](https://source.chromium.org) and open in local `VSCode` dir through just one click.*
+    - Status:
+
+        - *`VSCode` -> [source.chromium.org](https://source.chromium.org) (DONE)*
+
+        - *[source.chromium.org](https://source.chromium.org)  -> `VSCode` (In plan)*

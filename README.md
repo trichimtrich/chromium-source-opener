@@ -3,7 +3,7 @@
 [![.github/workflows/CI.yml](https://img.shields.io/github/workflow/status/EFanZh/Graphviz-Preview/CI/master)](https://github.com/EFanZh/Graphviz-Preview/actions?query=workflow%3A.github%2Fworkflows%2FCI.yml)
 [![Bors enabled](https://img.shields.io/badge/bors-enabled-brightgreen)](https://app.bors.tech/repositories/23758)
 
-Link your local chromium code path to remote [source.chromium.org](source.chromium.org).
+Link your local chromium code path to remote [source.chromium.org](https://source.chromium.org).
 
 ## Installation
 
@@ -11,13 +11,13 @@ You can install this extension from the [Visual Studio Marketplace](https://mark
 
 ## Usage
 
-Right click on the line you want to visit on remote [source.chromium.org](source.chromium.org).
+Right click on the line you want to visit on remote [source.chromium.org](https://source.chromium.org).
 
-For example in //base/values.h:104
+For example in `//base/values.h:104`
 
 <img src="images/CSO01.png" onerror="this.onerror=null; this.remove();" alt="CSO01.png" width="600"/>
 
-Then the same line will be opened in the browser on remote [source.chromium.org](source.chromium.org).
+Then the same line will be opened in the browser on remote [source.chromium.org](https://source.chromium.org).
 
 <img src="images/CSO02.png" onerror="this.onerror=null; this.remove();" alt="CSO02.png" width="600"/>
 

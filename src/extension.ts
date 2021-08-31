@@ -5,17 +5,21 @@ import * as open from 'open';
 import * as express from 'express';
 import * as fs from 'fs';
 import * as morgan from 'morgan';
+import * as child_process from 'child_process';
 
 /**
  * TODO:
  * 1. Add command for unlistening to Web.
  * 2. Add a Do not show again option for every notification.
- * 3. Bring current editor to foreground after it lost focus.
  */
 
 const SRC = "src";
 const LOG = "/tmp/chrome_source_opener.log";
 const WARNING_NOT_IN_SRC = `Please ensure in Chromium ${SRC}!`;
+const ERROR_STATUS = 404;
+const ERROR_IDE_NOT_OK = 
+	`Please ensure that the current workspace of your IDE is Chromium ${SRC}!`;
+const ERROR_FILE_PATH_NOT_FIND = "File path is not found in your request URL.";
 
 // Listen on local:PORT.
 const PORT = 8989;
@@ -23,25 +27,54 @@ const PORT = 8989;
 // Identify whether the server has been set up.
 let listen_started = false;
 
-// This extension mainly for Chromium src/ now.
-function checkCurrentWorkspace(
-	editor: vscode.TextEditor | undefined) : boolean {
-	if (!editor)
+function checkCurrentWorkspace() : boolean {
+	const workspaceFolder = getCurrentWorkspace();
+	if (!workspaceFolder) {
 		return false;
-
-	const workspaceFolder = vscode.workspace.getWorkspaceFolder(
-		editor.document.uri);
-	if (!workspaceFolder)
-		return false;
-	
-	return checkCurrentPath(workspaceFolder.name);
+	} else {
+		return checkCurrentPath(workspaceFolder.name);
+	}
 }
 
+function getCurrentWorkspace() : vscode.WorkspaceFolder | undefined {
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	if (!workspaceFolders) {
+		const errorMessage = 
+			"Working folder not found, open a folder and try again.";
+		
+		// Bring current editor to foreground if it losts focus.
+		var executed_command = `code`;
+		execute_command(executed_command);
+
+		vscode.window.showErrorMessage(errorMessage);
+		return undefined;
+	} else {
+		return workspaceFolders[0];
+	}
+}
+
+// This extension mainly for Chromium src/ now.
 function checkCurrentPath(path: string) : boolean {
 	if (!path)
 		return false;
 	
 	return path.search(SRC) != -1;
+}
+
+function execute_command(command: string) {
+	if (!command) {
+		return;
+	}
+
+	child_process.exec(command, (err, stdout, stderr) => {
+		if (err) {
+			console.log('error: ' + err);
+		}
+	});
+}
+
+function startedInDebugMode(context: vscode.ExtensionContext) : boolean{
+	return context.extensionMode == vscode.ExtensionMode.Development;
 }
 
 // Start server on local:PORT. Listen for GET.
@@ -56,45 +89,46 @@ function startServer() {
 	let app = express();
 	app.use(morgan('short', {stream: logSystem}));
 	app.get('/file', (req, res) => {
-		var editor = vscode.window.activeTextEditor;
-		if (!editor)
-			return;
-
-		if (!checkCurrentWorkspace(editor)) {
+		if (!checkCurrentWorkspace()) {
 			vscode.window.showWarningMessage(WARNING_NOT_IN_SRC);
+
+			res.status(ERROR_STATUS).send(ERROR_IDE_NOT_OK);
 			return;
 		}
 
 		var filePath = req.query.f;
-		if (!filePath)
+		if (!filePath) {
+			res.status(ERROR_STATUS).send(ERROR_FILE_PATH_NOT_FIND);
+			return;
+		}
+		
+		const workspace = getCurrentWorkspace();
+		// `workspace` is always defined. It's ensure by the checkness of 
+		// checkCurrentWorkspace(). The check here just for passing grammar 
+		// examination.
+		if (!workspace)
 			return;
 		
-		const fsPath = editor.document.uri.fsPath;
-		if (!fsPath)
-			return;
-		
-		var src_idx = fsPath.search(SRC);
-		var srcPath = fsPath.substr(0, src_idx + 4);
+		const workspaceName = workspace.uri.fsPath;
+		var src_idx = workspaceName.search(SRC);
+		var srcPath = workspaceName.substr(0, src_idx + 4);
 		var openPath = srcPath + '/' + filePath;
-		vscode.workspace.openTextDocument(vscode.Uri.file(openPath)).then(doc => {
-			vscode.window.showTextDocument(doc).then(editor => {
-				var lineNumber = Number(req.query.l);
-				var colNumber = 0;
-				var pos = new vscode.Position(lineNumber - 1, colNumber);
-				// Line added - by having a selection at the same position 
-				// twice, the cursor jumps there.
-				editor.selections = [new vscode.Selection(pos, pos)]; 
+		var lineNumber = Number(req.query.l);
+		var execute_command = `code -g ${openPath}:${lineNumber}`;
+		child_process.exec(execute_command, (err, stdout, stderr) => {
+			if (err) {
+				console.log('error: ' + err);
+				res.status(ERROR_STATUS)
+				.send("This error appears in local IDE: " + err.message);
 
-				// And the visible range jumps there too.
-				var range = new vscode.Range(pos, pos);
-				editor.revealRange(range);
-
-				// TODO: Bring current editor to foreground.
-				
-				console.log(`Open file - ${openPath}:${lineNumber}.`);
-				vscode.window.showInformationMessage('Opened from WEB source!');
-			});
+				return;
+			}
 		});
+
+		console.log(`Open file - ${openPath}:${lineNumber}.`);
+		vscode.window.showInformationMessage('Opened from WEB source!');
+
+		res.send("OK");
 	});
 
 	app.listen(PORT);
@@ -159,8 +193,8 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	// For testing. Should not enable in production environment.
-	if (vscode.debug.activeDebugSession && 
-		checkCurrentWorkspace(vscode.window.activeTextEditor)) {
+	if (startedInDebugMode(context) && 
+		checkCurrentWorkspace()) {
 		// Start listening.
 		startServer();
 	}

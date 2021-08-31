@@ -1,14 +1,14 @@
 {
 	"name": "chromium-source-opener",
 	"displayName": "Chromium Source Opener",
-	"description": "Link your local chromium code path to remote source.chromium.org",
+	"description": "Link your local chromium code path to remote source.chromium.org.",
 	"icon": "images/CSO-Icon.png",
 	"publisher": "FangzhenSong",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/song-fangzhen/chromium-source-opener"
 	},
-	"version": "1.0.11",
+	"version": "1.0.15",
 	"engines": {
 		"vscode": "^1.55.0"
 	},
@@ -19,6 +19,7 @@
 		"onCommand:chromium-source-opener.listenToWeb",
 		"onCommand:chromium-source-opener.openInWeb"
 	],
+	"license": "MIT",
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
@@ -67,6 +68,8 @@
 	"dependencies": {
 		"express": "^4.17.1",
 		"open": "^8.2.1",
-		"fs": "^0.0.1-security"
+		"fs": "^0.0.1-security",
+		"morgan": "^1.10.0",
+		"child_process": "^1.0.2"
 	}
 }

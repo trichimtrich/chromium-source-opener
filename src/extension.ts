@@ -16,6 +16,7 @@ import * as child_process from 'child_process';
 const SRC = "src";
 const LOG = "/tmp/chrome_source_opener.log";
 const WARNING_NOT_IN_SRC = `Please ensure in Chromium ${SRC}!`;
+const ERROR_START_LISTENING_FAIL = "Http server cannot be started.";
 const ERROR_STATUS = 404;
 const ERROR_IDE_NOT_OK = 
 	`Please ensure that the current workspace of your IDE is Chromium ${SRC}!`;
@@ -53,7 +54,7 @@ function getCurrentWorkspace() : vscode.WorkspaceFolder | undefined {
 	}
 }
 
-// This extension mainly for Chromium src/ now.
+// This extension is mainly for Chromium src/ now.
 function checkCurrentPath(path: string) : boolean {
 	if (!path)
 		return false;
@@ -81,6 +82,14 @@ function startedInDebugMode(context: vscode.ExtensionContext) : boolean{
 function startServer() {
 	if (listen_started) {
 		vscode.window.showWarningMessage('Server already started!');
+		return;
+	}
+
+	// Make sure that we are listening in Chromium src/.
+	if (!checkCurrentWorkspace()) {
+		vscode.window.showErrorMessage(ERROR_START_LISTENING_FAIL);
+		vscode.window.showWarningMessage(WARNING_NOT_IN_SRC);
+
 		return;
 	}
 

@@ -8,7 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 **V1.0**
 
-- Link [CSO](https://marketplace.visualstudio.com/items?itemName=FangzhenSong.chromium-source-opener)(chromium-source-opener) with [COI](https://github.com/song-fangzhen/chromium-open-ide/releases/tag/v1.2)(chromium-open-ide).
+- Link [CSO](https://marketplace.visualstudio.com/items?itemName=FangzhenSong.chromium-source-opener)(chromium-source-opener) with [COI](https://microsoftedge.microsoft.com/addons/detail/chromium-open-ide/ggfoollpnfolfaejalpiihpobcpbegkl)(chromium-open-ide).
 
 **Initial release**
 

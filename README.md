@@ -9,7 +9,7 @@ Link your local chromium code path to remote [source.chromium.org](https://sourc
 
 You can install this extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=FangzhenSong.chromium-source-opener).
 
-*Tips: To enable the ability of linking remote [source.chromium.org](https://source.chromium.org) code path to your local chromium src, you should also install related [Chrome Extension](https://github.com/song-fangzhen/chromium-open-ide/releases/tag/v1.2).*
+*Tips: To enable the ability of linking remote [source.chromium.org](https://source.chromium.org) code path to your local chromium src, you should also install related [MSEdge Extension](https://microsoftedge.microsoft.com/addons/detail/chromium-open-ide/ggfoollpnfolfaejalpiihpobcpbegkl).*
 
 ## Usage
 

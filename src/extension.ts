@@ -13,14 +13,16 @@ import * as child_process from 'child_process';
  * 2. Add a Do not show again option for every notification.
  */
 
-const SRC = "src";
-const LOG = "/tmp/chrome_source_opener.log";
+const SRC = 'src';
+const LOG = '/tmp/chrome_source_opener.log';
 const WARNING_NOT_IN_SRC = `Please ensure in Chromium ${SRC}!`;
-const ERROR_START_LISTENING_FAIL = "Http server cannot be started.";
+const ERROR_START_LISTENING_FAIL = 'Http server cannot be started.';
 const ERROR_STATUS = 404;
 const ERROR_IDE_NOT_OK = 
 	`Please ensure that the current workspace of your IDE is Chromium ${SRC}!`;
-const ERROR_FILE_PATH_NOT_FIND = "File path is not found in your request URL.";
+const ERROR_FILE_PATH_NOT_FIND = 'File path is not found in your request URL.';
+const ERROR_FILE_NOT_FIND = 
+	`The request file does not exist in local Chromium ${SRC} version.`;
 
 // Listen on local:PORT.
 const PORT = 8989;
@@ -41,11 +43,9 @@ function getCurrentWorkspace() : vscode.WorkspaceFolder | undefined {
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	if (!workspaceFolders) {
 		const errorMessage = 
-			"Working folder not found, open a folder and try again.";
+			'Working folder not found, open a folder and try again.';
 		
-		// Bring current editor to foreground if it losts focus.
-		var executed_command = `code`;
-		execute_command(executed_command);
+		activeTextEditor();
 
 		vscode.window.showErrorMessage(errorMessage);
 		return undefined;
@@ -62,16 +62,29 @@ function checkCurrentPath(path: string) : boolean {
 	return path.search(SRC) != -1;
 }
 
-function execute_command(command: string) {
+function execute_command(command: string) : string | undefined {
 	if (!command) {
-		return;
+		return 'The input "command" is null';
 	}
 
 	child_process.exec(command, (err, stdout, stderr) => {
 		if (err) {
 			console.log('error: ' + err);
+			return err.message;
 		}
 	});
+	return undefined;
+}
+
+// Bring current editor to foreground if it losts focus.
+// Also show the error message if not null.
+function activeTextEditor(error?: string) {
+	var executed_command = `code`;
+	execute_command(executed_command);
+
+	if (error) {
+		vscode.window.showErrorMessage(error);
+	}
 }
 
 function startedInDebugMode(context: vscode.ExtensionContext) : boolean{
@@ -107,32 +120,40 @@ function startServer() {
 
 		var filePath = req.query.f;
 		if (!filePath) {
+			activeTextEditor(ERROR_FILE_PATH_NOT_FIND);
+
 			res.status(ERROR_STATUS).send(ERROR_FILE_PATH_NOT_FIND);
 			return;
 		}
-		
-		const workspace = getCurrentWorkspace();
+
+
+		const workspaceFolder = getCurrentWorkspace();
 		// `workspace` is always defined. It's ensure by the checkness of 
 		// checkCurrentWorkspace(). The check here just for passing grammar 
 		// examination.
-		if (!workspace)
+		if (!workspaceFolder)
 			return;
 		
-		const workspaceName = workspace.uri.fsPath;
+		const workspaceName = workspaceFolder.uri.fsPath;
 		var src_idx = workspaceName.search(SRC);
 		var srcPath = workspaceName.substr(0, src_idx + 4);
 		var openPath = srcPath + '/' + filePath;
-		var lineNumber = Number(req.query.l);
-		var execute_command = `code -g ${openPath}:${lineNumber}`;
-		child_process.exec(execute_command, (err, stdout, stderr) => {
-			if (err) {
-				console.log('error: ' + err);
-				res.status(ERROR_STATUS)
-				.send("This error appears in local IDE: " + err.message);
+		if (!fs.existsSync(openPath)) {
+			activeTextEditor(ERROR_FILE_NOT_FIND);
 
-				return;
-			}
-		});
+			res.status(ERROR_STATUS).send(ERROR_FILE_NOT_FIND);
+			return;
+		}
+
+		var lineNumber = Number(req.query.l);
+		var executed_command = `code -g ${openPath}:${lineNumber}`;
+		var err_message = execute_command(executed_command);
+		if (err_message) {
+			res.status(ERROR_STATUS)
+			.send('This error appears in local IDE: ' + err_message);
+
+			return;
+		}
 
 		console.log(`Open file - ${openPath}:${lineNumber}.`);
 		vscode.window.showInformationMessage('Opened from WEB source!');
@@ -155,7 +176,7 @@ async function sendRequest() {
 		return;
 	}
 
-	const baseUrl = "https://source.chromium.org/chromium/chromium/src/+/main:";
+	const baseUrl = 'https://source.chromium.org/chromium/chromium/src/+/main:';
 	var path = editor.document.uri.fsPath;
 	var src_idx = path.search(SRC);
 	if (src_idx == -1) {

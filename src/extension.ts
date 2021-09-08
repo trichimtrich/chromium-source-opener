@@ -45,7 +45,7 @@ function getCurrentWorkspace() : vscode.WorkspaceFolder | undefined {
 		const errorMessage = 
 			'Working folder not found, open a folder and try again.';
 		
-		activeTextEditor();
+		activateTextEditor();
 
 		vscode.window.showErrorMessage(errorMessage);
 		return undefined;
@@ -78,8 +78,8 @@ function execute_command(command: string) : string | undefined {
 
 // Bring current editor to foreground if it losts focus.
 // Also show the error message if not null.
-function activeTextEditor(error?: string) {
-	var executed_command = `code`;
+function activateTextEditor(error?: string) {
+	var executed_command = `code -r`;
 	execute_command(executed_command);
 
 	if (error) {
@@ -120,7 +120,7 @@ function startServer() {
 
 		var filePath = req.query.f;
 		if (!filePath) {
-			activeTextEditor(ERROR_FILE_PATH_NOT_FIND);
+			activateTextEditor(ERROR_FILE_PATH_NOT_FIND);
 
 			res.status(ERROR_STATUS).send(ERROR_FILE_PATH_NOT_FIND);
 			return;
@@ -139,7 +139,7 @@ function startServer() {
 		var srcPath = workspaceName.substr(0, src_idx + 4);
 		var openPath = srcPath + '/' + filePath;
 		if (!fs.existsSync(openPath)) {
-			activeTextEditor(ERROR_FILE_NOT_FIND);
+			activateTextEditor(ERROR_FILE_NOT_FIND);
 
 			res.status(ERROR_STATUS).send(ERROR_FILE_NOT_FIND);
 			return;

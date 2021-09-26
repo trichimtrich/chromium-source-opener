@@ -1,8 +1,5 @@
 # CSO(Chromium Source Opener)
 
-[![.github/workflows/CI.yml](https://img.shields.io/github/workflow/status/EFanZh/Graphviz-Preview/CI/master)](https://github.com/EFanZh/Graphviz-Preview/actions?query=workflow%3A.github%2Fworkflows%2FCI.yml)
-[![Bors enabled](https://img.shields.io/badge/bors-enabled-brightgreen)](https://app.bors.tech/repositories/23758)
-
 Link your local chromium code path to remote [source.chromium.org](https://source.chromium.org).
 
 ## Installation

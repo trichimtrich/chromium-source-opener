@@ -6,6 +6,7 @@ import * as express from 'express';
 import * as fs from 'fs';
 import * as morgan from 'morgan';
 import * as child_process from 'child_process';
+import * as RateLimit from 'express-rate-limit';
 
 /**
  * TODO:
@@ -108,8 +109,18 @@ function startServer() {
 
 	let logSystem = fs.createWriteStream(LOG, {flags: 'a'});
 
+	// Set up rate limiter: maximum of five requests per minute
+	var limiter = RateLimit({
+		windowMs: 1*60*1000, // 1 minute
+		max: 5
+	});
+
 	let app = express();
 	app.use(morgan('short', {stream: logSystem}));
+	
+	// Apply rate limiter to all requests
+	app.use(limiter);
+
 	app.get('/file', (req, res) => {
 		if (!checkCurrentWorkspace()) {
 			vscode.window.showWarningMessage(WARNING_NOT_IN_SRC);

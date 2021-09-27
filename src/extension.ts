@@ -29,7 +29,7 @@ const ERROR_FILE_NOT_FIND =
 const PORT = 8989;
 
 // Identify whether the server has been set up.
-let listen_started = false;
+let listenStarted = false;
 
 function checkCurrentWorkspace() : boolean {
 	const workspaceFolder = getCurrentWorkspace();
@@ -57,13 +57,14 @@ function getCurrentWorkspace() : vscode.WorkspaceFolder | undefined {
 
 // This extension is mainly for Chromium src/ now.
 function checkCurrentPath(path: string) : boolean {
-	if (!path)
+	if (!path) {
 		return false;
+	}
 	
-	return path.search(SRC) != -1;
+	return path.search(SRC) !== -1;
 }
 
-function execute_command(command: string) : string | undefined {
+function executeCommand(command: string) : string | undefined {
 	if (!command) {
 		return 'The input "command" is null';
 	}
@@ -80,8 +81,8 @@ function execute_command(command: string) : string | undefined {
 // Bring current editor to foreground if it losts focus.
 // Also show the error message if not null.
 function activateTextEditor(error?: string) {
-	var executed_command = `code -r`;
-	execute_command(executed_command);
+	var executedCommand = `code -r`;
+	executeCommand(executedCommand);
 
 	if (error) {
 		vscode.window.showErrorMessage(error);
@@ -89,12 +90,12 @@ function activateTextEditor(error?: string) {
 }
 
 function startedInDebugMode(context: vscode.ExtensionContext) : boolean{
-	return context.extensionMode == vscode.ExtensionMode.Development;
+	return context.extensionMode === vscode.ExtensionMode.Development;
 }
 
 // Start server on local:PORT. Listen for GET.
 function startServer() {
-	if (listen_started) {
+	if (listenStarted) {
 		vscode.window.showWarningMessage('Server already started!');
 		return;
 	}
@@ -142,12 +143,13 @@ function startServer() {
 		// `workspace` is always defined. It's ensure by the checkness of 
 		// checkCurrentWorkspace(). The check here just for passing grammar 
 		// examination.
-		if (!workspaceFolder)
+		if (!workspaceFolder) {
 			return;
+		}
 		
 		const workspaceName = workspaceFolder.uri.fsPath;
-		var src_idx = workspaceName.search(SRC);
-		var srcPath = workspaceName.substr(0, src_idx + 4);
+		var srcIdx = workspaceName.search(SRC);
+		var srcPath = workspaceName.substr(0, srcIdx + 4);
 		var openPath = srcPath + '/' + filePath;
 		if (!fs.existsSync(openPath)) {
 			activateTextEditor(ERROR_FILE_NOT_FIND);
@@ -157,11 +159,11 @@ function startServer() {
 		}
 
 		var lineNumber = Number(req.query.l);
-		var executed_command = `code -g ${openPath}:${lineNumber}`;
-		var err_message = execute_command(executed_command);
-		if (err_message) {
+		var executedCommand = `code -g ${openPath}:${lineNumber}`;
+		var errMessage = executeCommand(executedCommand);
+		if (errMessage) {
 			res.status(ERROR_STATUS)
-			.send('This error appears in local IDE: ' + err_message);
+			.send('This error appears in local IDE: ' + errMessage);
 
 			return;
 		}
@@ -176,7 +178,7 @@ function startServer() {
 
 	vscode.window.showInformationMessage(
 		'Listening to source.chromium.org successfuly!');
-	listen_started = true;
+	listenStarted = true;
 }
 
 // Send request to remote source.chromium.org.
@@ -189,12 +191,12 @@ async function sendRequest() {
 
 	const baseUrl = 'https://source.chromium.org/chromium/chromium/src/+/main:';
 	var path = editor.document.uri.fsPath;
-	var src_idx = path.search(SRC);
-	if (src_idx == -1) {
+	var srcIdx = path.search(SRC);
+	if (srcIdx === -1) {
 		vscode.window.showWarningMessage(WARNING_NOT_IN_SRC);
 		return;
 	}
-	path = path.substring(src_idx + 4 );
+	path = path.substring(srcIdx + 4 );
 	var line = (editor.selection.active.line + 1).toString();
 	var queryUrl = `${baseUrl}${path};l=${line}`;
 	const selection = editor.selection;
@@ -223,14 +225,14 @@ export function activate(context: vscode.ExtensionContext) {
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
 	// TODO: Add command for unlistening to Web.
-	let listen_to_web = vscode.commands.registerCommand(
+	let listenToWeb = vscode.commands.registerCommand(
 		'chromium-source-opener.listenToWeb', startServer);
-	let open_in_web = vscode.commands.registerCommand(
+	let openInWeb = vscode.commands.registerCommand(
 		'chromium-source-opener.openInWeb', sendRequest);
 
 	context.subscriptions.push(
-		listen_to_web,
-		open_in_web
+		listenToWeb,
+		openInWeb
 	);
 
 	// For testing. Should not enable in production environment.

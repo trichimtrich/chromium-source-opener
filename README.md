@@ -1,6 +1,7 @@
 # CSO(Chromium Source Opener)
 
-[![Bors enabled](https://bors.tech/images/badge_small.svg)](https://app.bors.tech/repositories/37745)
+[![CodeQL workflow](https://github.com/song-fangzhen/chromium-source-opener/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/song-fangzhen/chromium-source-opener/actions/workflows/codeql-analysis.yml)
+[![Bors enabled](https://bors.tech/images/badge_small.svg)](https://app.bors.tech/repositories/37744)
 
 Link your local chromium code path to remote [source.chromium.org](https://source.chromium.org).
 

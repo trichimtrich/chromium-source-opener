@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import * as morgan from 'morgan';
 import * as child_process from 'child_process';
 import * as RateLimit from 'express-rate-limit';
+import { findClosestLine } from './diff';
 
 /**
  * TODO:
@@ -194,29 +195,69 @@ async function sendRequest() {
 		vscode.window.showWarningMessage('Not in a valid editor!');
 		return;
 	}
-	const baseUrl = 'https://source.chromium.org/chromium/chromium/src/+/main:';
-	var path = editor.document.uri.fsPath;
-	log("hehe: " + path);
 
-	var srcIdx = path.search(SRC);
-	if (srcIdx === -1) {
-		vscode.window.showWarningMessage(WARNING_NOT_IN_SRC);
+	var path = editor.document.uri.fsPath.replace(/\\/g, '/');
+	log('path: ' + path);
+
+	var dirname = path.substring(0, path.lastIndexOf('/'));
+	var filename = path.substring(path.lastIndexOf('/') + 1);
+
+	try {
+		// get the remote origin url
+		var remoteUrl = child_process.execSync('git remote get-url origin', {cwd: dirname}).toString();
+		log('remoteUrl: ' + remoteUrl);
+
+		// get the current commit hash
+		var commitHash = child_process.execSync('git rev-parse HEAD', {cwd: dirname}).toString();
+		log('commitHash: ' + commitHash);
+
+		// get full file path from git repo
+		var fullPath = child_process.execSync(`git ls-files --full-name ${filename}`, {cwd: dirname}).toString();
+		log('fullPath: ' + fullPath);
+
+		// get diff of current file
+		var diff = child_process.execSync(`git diff ${filename}`, {cwd: dirname}).
+			toString();
+
+	} catch (e) {
+		log('Error: ' + e);
+		vscode.window.showErrorMessage('Not in a valid git repository!');
 		return;
 	}
-	path = path.substring(srcIdx + 4 );
-	var line = (editor.selection.active.line + 1).toString();
-	var queryUrl = `${baseUrl}${path};l=${line}`;
-	const selection = editor.selection;
-	if (!selection.isEmpty) {
-		const selected = editor.document.getText(new vscode.Range
-			(selection.start, selection.end));
-		queryUrl += `?q=${selected}`;
-	}
-	// log(path, line, selection.isEmpty);
-	await open(queryUrl);
 
-	// Display a message box to the user
-	vscode.window.showInformationMessage('Code succesfully showed in WebSite!');
+	// guess the source
+	var isGoogleSource = remoteUrl.includes('googlesource.com');
+	var isChromium = remoteUrl.startsWith('https://chromium.googlesource.com/chromium/src.git');
+	var isGithub = remoteUrl.includes('github.com');
+
+	// guess the closest line
+	var line = editor.selection.active.line + 1;
+	log('line: ' + line);
+	var closestLine = findClosestLine(line, diff);
+	log('closestLine: ' + closestLine);
+
+	// open in browser
+	if (isChromium) {
+		// https://source.chromium.org/chromium/chromium/src/+/0db6a70c51edfdfe5a8dffaeeed88ca3fe37103f:net/cert_net/cert_net_fetcher_url_request.cc;l=25
+		var queryUrl = `https://source.chromium.org/chromium/chromium/src/+/` +
+			`${commitHash}:${fullPath};l=${closestLine}`;
+	} else if (isGoogleSource) {
+		// https://chromium.googlesource.com/chromium/src.git/+/63015eb7fb3371dd0f1fdca41747a51c8bb94eca/chrome/browser/signin/bound_session_credentials/bound_session_cookie_refresh_service_impl.cc#17
+		var queryUrl = `${remoteUrl}/+/` +
+			`${commitHash}/${fullPath}#${closestLine}`;
+	} else if (isGithub) {
+		// git@github.com:
+		remoteUrl = remoteUrl.replace('git@github.com:', 'https://github.com/');
+
+		// https://github.com/koalamer/vsc-labeled-bookmarks/blob/42b966a7670761f3b7316b8ab63726eb1330745e/.vscodeignore#L5
+		var queryUrl = `${remoteUrl}/blob/${commitHash}/${fullPath}#L${closestLine}`;
+	} else {
+		vscode.window.showErrorMessage('Not in a valid git repository!');
+		return;
+	}
+
+	log('queryUrl: ' + queryUrl);
+	await open(queryUrl);
 }
 
 // this method is called when your extension is activated

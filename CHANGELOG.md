@@ -6,10 +6,16 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Release]
 
+**v1.2.0**
+
+- Add logger
+- Implement closest line finder algo
+- Open selected line in chromium code search, google git, and github
+
 **v1.0.21**
 
-- Link [CSO](https://marketplace.visualstudio.com/items?itemName=FangzhenSong.chromium-source-opener)(chromium-source-opener) with related 
-[Chrome Extension](https://chrome.google.com/webstore/detail/chromium-open-ide/oodolphplfmnljcohclgdikkoljjambi) and 
+- Link [CSO](https://marketplace.visualstudio.com/items?itemName=FangzhenSong.chromium-source-opener)(chromium-source-opener) with related
+[Chrome Extension](https://chrome.google.com/webstore/detail/chromium-open-ide/oodolphplfmnljcohclgdikkoljjambi) and
 [MSEdge Extension](https://microsoftedge.microsoft.com/addons/detail/chromium-open-ide/ggfoollpnfolfaejalpiihpobcpbegkl).
 
 **v1.0**

@@ -1,16 +1,13 @@
 # CSO(Chromium Source Opener)
 
-[![CodeQL workflow](https://github.com/song-fangzhen/chromium-source-opener/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/song-fangzhen/chromium-source-opener/actions/workflows/codeql-analysis.yml)
-[![Bors enabled](https://bors.tech/images/badge_small.svg)](https://app.bors.tech/repositories/37744)
-
 Link your local chromium code path to remote [source.chromium.org](https://source.chromium.org).
 
 ## Installation
 
 You can install this extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=FangzhenSong.chromium-source-opener).
 
-*Tips: to enable the ability to link remote 
-[source.chromium.org](https://source.chromium.org) code path to your local chromium src, you should also install related 
+*Tips: to enable the ability to link remote
+[source.chromium.org](https://source.chromium.org) code path to your local chromium src, you should also install related
 [Chrome Extension](https://chrome.google.com/webstore/detail/chromium-open-ide/oodolphplfmnljcohclgdikkoljjambi)/[MSEdge Extension](https://microsoftedge.microsoft.com/addons/detail/chromium-open-ide/ggfoollpnfolfaejalpiihpobcpbegkl).*
 
 ## Usage

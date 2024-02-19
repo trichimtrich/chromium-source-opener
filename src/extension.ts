@@ -19,10 +19,10 @@ const LOG = '/tmp/chrome_source_opener.log';
 const WARNING_NOT_IN_SRC = `Please ensure in Chromium ${SRC}!`;
 const ERROR_START_LISTENING_FAIL = 'Http server cannot be started.';
 const ERROR_STATUS = 404;
-const ERROR_IDE_NOT_OK = 
+const ERROR_IDE_NOT_OK =
 	`Please ensure that the current workspace of your IDE is Chromium ${SRC}!`;
 const ERROR_FILE_PATH_NOT_FIND = 'File path is not found in your request URL.';
-const ERROR_FILE_NOT_FIND = 
+const ERROR_FILE_NOT_FIND =
 	`The request file does not exist in local Chromium ${SRC} version.`;
 
 // Listen on local:PORT.
@@ -30,6 +30,12 @@ const PORT = 8989;
 
 // Identify whether the server has been set up.
 let listenStarted = false;
+
+let logger: vscode.OutputChannel | null;
+function log(message: string) {
+	let date = new Date();
+	logger?.appendLine(date.toISOString() + " " + message);
+}
 
 function checkCurrentWorkspace() : boolean {
 	const workspaceFolder = getCurrentWorkspace();
@@ -43,9 +49,9 @@ function checkCurrentWorkspace() : boolean {
 function getCurrentWorkspace() : vscode.WorkspaceFolder | undefined {
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	if (!workspaceFolders) {
-		const errorMessage = 
+		const errorMessage =
 			'Working folder not found, open a folder and try again.';
-		
+
 		activateTextEditor();
 
 		vscode.window.showErrorMessage(errorMessage);
@@ -60,7 +66,7 @@ function checkCurrentPath(path: string) : boolean {
 	if (!path) {
 		return false;
 	}
-	
+
 	return path.search(SRC) !== -1;
 }
 
@@ -71,7 +77,7 @@ function executeCommand(command: string) : string | undefined {
 
 	child_process.exec(command, (err, stdout, stderr) => {
 		if (err) {
-			console.log('error: ' + err);
+			log('error: ' + err);
 			return err.message;
 		}
 	});
@@ -118,7 +124,7 @@ function startServer() {
 
 	let app = express();
 	app.use(morgan('short', {stream: logSystem}));
-	
+
 	// Apply rate limiter to all requests
 	app.use(limiter);
 
@@ -140,13 +146,13 @@ function startServer() {
 
 
 		const workspaceFolder = getCurrentWorkspace();
-		// `workspace` is always defined. It's ensure by the checkness of 
-		// checkCurrentWorkspace(). The check here just for passing grammar 
+		// `workspace` is always defined. It's ensure by the checkness of
+		// checkCurrentWorkspace(). The check here just for passing grammar
 		// examination.
 		if (!workspaceFolder) {
 			return;
 		}
-		
+
 		const workspaceName = workspaceFolder.uri.fsPath;
 		var srcIdx = workspaceName.search(SRC);
 		var srcPath = workspaceName.substr(0, srcIdx + 4);
@@ -168,7 +174,7 @@ function startServer() {
 			return;
 		}
 
-		console.log(`Open file - ${openPath}:${lineNumber}.`);
+		log(`Open file - ${openPath}:${lineNumber}.`);
 		vscode.window.showInformationMessage('Opened from WEB source!');
 
 		res.send("OK");
@@ -188,9 +194,10 @@ async function sendRequest() {
 		vscode.window.showWarningMessage('Not in a valid editor!');
 		return;
 	}
-
 	const baseUrl = 'https://source.chromium.org/chromium/chromium/src/+/main:';
 	var path = editor.document.uri.fsPath;
+	log("hehe: " + path);
+
 	var srcIdx = path.search(SRC);
 	if (srcIdx === -1) {
 		vscode.window.showWarningMessage(WARNING_NOT_IN_SRC);
@@ -205,7 +212,7 @@ async function sendRequest() {
 			(selection.start, selection.end));
 		queryUrl += `?q=${selected}`;
 	}
-	console.log(path, line, selection.isEmpty);
+	// log(path, line, selection.isEmpty);
 	await open(queryUrl);
 
 	// Display a message box to the user
@@ -215,11 +222,10 @@ async function sendRequest() {
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log(
-		'Congratulations, your extension "Chromium Source Opener" is now active!');
+
+	logger = vscode.window.createOutputChannel('Chromium Source Opener');
+
+	log('Congratulations, your extension "Chromium Source Opener" is now active!');
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
@@ -236,11 +242,13 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	// For testing. Should not enable in production environment.
-	if (startedInDebugMode(context) && 
+	if (startedInDebugMode(context) &&
 		checkCurrentWorkspace()) {
 		// Start listening.
 		startServer();
 	}
+
+	vscode.window.showInformationMessage('Chromium Source Opener is now active!');
 }
 
 // this method is called when your extension is deactivated

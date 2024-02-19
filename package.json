@@ -17,7 +17,8 @@
 	],
 	"activationEvents": [
 		"onCommand:chromium-source-opener.listenToWeb",
-		"onCommand:chromium-source-opener.openInWeb"
+		"onCommand:chromium-source-opener.openInWeb",
+		"onStartupFinished"
 	],
 	"license": "MIT",
 	"main": "./out/extension.js",

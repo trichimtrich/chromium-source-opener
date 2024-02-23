@@ -6,6 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Release]
 
+**v1.2.1**
+
+- Trim git result
+- Fix github query URL
+
 **v1.2.0**
 
 - Add logger

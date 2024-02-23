@@ -204,15 +204,15 @@ async function sendRequest() {
 
 	try {
 		// get the remote origin url
-		var remoteUrl = child_process.execSync('git remote get-url origin', {cwd: dirname}).toString();
+		var remoteUrl = child_process.execSync('git remote get-url origin', {cwd: dirname}).toString().trim();
 		log('remoteUrl: ' + remoteUrl);
 
 		// get the current commit hash
-		var commitHash = child_process.execSync('git rev-parse HEAD', {cwd: dirname}).toString();
+		var commitHash = child_process.execSync('git rev-parse HEAD', {cwd: dirname}).toString().trim();
 		log('commitHash: ' + commitHash);
 
 		// get full file path from git repo
-		var fullPath = child_process.execSync(`git ls-files --full-name ${filename}`, {cwd: dirname}).toString();
+		var fullPath = child_process.execSync(`git ls-files --full-name ${filename}`, {cwd: dirname}).toString().trim();
 		log('fullPath: ' + fullPath);
 
 		// get diff of current file
@@ -248,6 +248,9 @@ async function sendRequest() {
 	} else if (isGithub) {
 		// git@github.com:
 		remoteUrl = remoteUrl.replace('git@github.com:', 'https://github.com/');
+		if (remoteUrl.endsWith('.git')) {
+			remoteUrl = remoteUrl.slice(0, -4);
+		}
 
 		// https://github.com/koalamer/vsc-labeled-bookmarks/blob/42b966a7670761f3b7316b8ab63726eb1330745e/.vscodeignore#L5
 		var queryUrl = `${remoteUrl}/blob/${commitHash}/${fullPath}#L${closestLine}`;
